@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="QuantumStego — Hide and reveal secret messages in images using quantum computing simulation and passphrase authentication."/>
+  <meta name="theme-color" content="#03070f"/>
+  <title>QuantumStego — Quantum-Powered Steganography</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="js-particles" aria-hidden="true"></div>
+  <canvas id="js-bg-canvas" aria-hidden="true"></canvas>
+ 
+  <div class="app-wrapper" id="main-content">
+ 
+    <header class="site-header" role="banner">
+      <div class="status-badge" aria-live="polite">
+        <span class="status-dot" aria-hidden="true"></span>
+        Quantum Engine Active
+      </div>
+      <h1 class="site-title">QUANTUM STEGO</h1>
+      <p class="site-tagline">
+        Hide &amp; reveal secrets using <em>Quantum Computing</em> + Passphrase Authentication
+      </p>
+    </header>
+ 
+    <section class="concept-grid" aria-label="Quantum concepts">
+      <article class="concept-card cc--cyan" tabindex="0">
+        <span class="concept-icon" aria-hidden="true">⚛️</span>
+        <div class="concept-name">Superposition</div>
+        <p class="concept-desc">Each qubit exists as |0⟩ and |1⟩ simultaneously — all pixel positions evaluated at once.</p>
+      </article>
+      <article class="concept-card cc--teal" tabindex="0">
+        <span class="concept-icon" aria-hidden="true">🔗</span>
+        <div class="concept-name">Entanglement</div>
+        <p class="concept-desc">CNOT gates entangle qubit pairs, creating correlated quantum keys for secure embedding.</p>
+      </article>
+      <article class="concept-card cc--gold" tabindex="0">
+        <span class="concept-icon" aria-hidden="true">🌀</span>
+        <div class="concept-name">Hadamard Gate</div>
+        <p class="concept-desc">H|0⟩ = (|0⟩+|1⟩)/√2 — puts all 8 qubits into superposition for quantum key generation.</p>
+      </article>
+      <article class="concept-card cc--green" tabindex="0">
+        <span class="concept-icon" aria-hidden="true">🔐</span>
+        <div class="concept-name">Auth Layer</div>
+        <p class="concept-desc">Passphrase hashed via djb2 ⊕ fnv1a and XOR'd with quantum key — only correct pass unlocks.</p>
+      </article>
+    </section>
+ 
+    <section class="circuit-section" aria-label="Live quantum circuit simulation">
+      <div class="section-heading">
+        <h2>⚡ Live Quantum Circuit Simulation</h2>
+      </div>
+      <canvas id="js-circuit-canvas" aria-label="Animated quantum circuit with 8 qubits"></canvas>
+    </section>
+ 
+    <div class="tab-bar" role="tablist" aria-label="Application mode">
+      <button class="tab-btn" role="tab" id="tab-encode" aria-selected="true" aria-controls="panel-encode" onclick="App.switchTab('encode')">
+        <span class="tab-icon" aria-hidden="true">🔒</span>ENCODE
+      </button>
+      <button class="tab-btn" role="tab" id="tab-decode" aria-selected="false" aria-controls="panel-decode" onclick="App.switchTab('decode')">
+        <span class="tab-icon" aria-hidden="true">🔓</span>DECODE
+      </button>
+    </div>
+ 
+    <!-- ENCODE PANEL -->
+    <section class="main-panel" id="panel-encode" role="tabpanel" aria-labelledby="tab-encode">
+      <div class="drop-zone" id="enc-dropzone" aria-label="Upload cover image">
+        <input class="drop-zone__file-input" type="file" id="enc-file-input" accept="image/png,image/jpeg,image/webp,image/bmp" aria-label="Choose a cover image file"/>
+        <span class="drop-zone__icon" aria-hidden="true">🖼️</span>
+        <span class="drop-zone__title">Upload Cover Image</span>
+        <span class="drop-zone__sub">PNG / JPG / WebP — drag &amp; drop or click to browse</span>
+      </div>
+ 
+      <div class="preview-grid" id="enc-preview-grid">
+        <div class="preview-box">
+          <img class="preview-box__img" id="enc-preview-img" src="" alt="Cover image preview"/>
+          <span class="preview-box__label">COVER IMAGE</span>
+          <span class="preview-box__info" id="enc-img-info" aria-live="polite">—</span>
+        </div>
+        <div class="preview-box" id="enc-stego-box" hidden>
+          <img class="preview-box__img" id="enc-stego-img" src="" alt="Stego image"/>
+          <span class="preview-box__label">STEGO IMAGE — hidden text embedded</span>
+          <span class="preview-box__info" id="enc-stego-info" aria-live="polite">—</span>
+        </div>
+      </div>
+ 
+      <div class="key-panel" id="enc-key-panel" aria-label="Quantum key information">
+        <div class="key-panel__label">🔑 Quantum Key — H⊗8 → CNOT chain → Rz → Measure</div>
+        <div class="key-bits" id="enc-key-bits" role="list" aria-label="Quantum key bits"></div>
+        <div class="key-stats" id="enc-key-stats" aria-live="polite"></div>
+      </div>
+ 
+      <div class="passphrase-group" role="group" aria-labelledby="enc-pass-label">
+        <div class="passphrase-label" id="enc-pass-label">
+          <span aria-hidden="true">🔐</span> Passphrase (required to lock your message)
+        </div>
+        <div class="passphrase-row">
+          <input class="passphrase-input" type="password" id="enc-passphrase" autocomplete="new-password" spellcheck="false" placeholder="Enter a secret passphrase…" aria-describedby="enc-pass-hint"/>
+          <button class="passphrase-toggle" type="button" id="enc-pass-toggle" aria-label="Toggle passphrase visibility">👁</button>
+          <button class="passphrase-suggest" type="button" id="enc-pass-suggest" aria-label="Generate a suggested strong passphrase">Suggest</button>
+        </div>
+        <div class="strength-bar-track" aria-hidden="true">
+          <div class="strength-bar-fill" id="enc-strength-fill"></div>
+        </div>
+        <span class="passphrase-hint" id="enc-pass-hint" aria-live="polite">Only someone with this passphrase can decode the message</span>
+      </div>
+ 
+      <label for="enc-message" class="visually-hidden">Secret message</label>
+      <textarea class="message-textarea" id="enc-message" placeholder="Enter your secret message…" aria-describedby="enc-char-counter" maxlength="100000"></textarea>
+      <div class="char-counter" id="enc-char-counter" aria-live="polite">0 / — chars</div>
+ 
+      <div class="process-log" id="enc-log" role="log" aria-label="Encoding process log" aria-live="polite"></div>
+ 
+      <div class="progress-wrap" id="enc-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="progress-header">
+          <span class="progress-header__label" id="enc-progress-label">Initialising…</span>
+          <span class="progress-header__pct" id="enc-progress-pct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="enc-progress-fill"></div>
+        </div>
+      </div>
+ 
+      <button class="btn btn--cyan" id="enc-submit-btn" type="button" onclick="App.runEncode()">⚛️ Quantum Encode — Embed Hidden Message</button>
+      <button class="btn btn--gold" id="enc-download-btn" type="button" hidden onclick="App.downloadStego()">⬇ Download Stego Image (PNG)</button>
+ 
+      <div class="stats-grid" id="enc-stats" aria-label="Encoding statistics">
+        <div class="stat-card"><span class="stat-value" id="enc-stat-qubits">—</span><span class="stat-label">Qubits Used</span></div>
+        <div class="stat-card"><span class="stat-value" id="enc-stat-gates">—</span><span class="stat-label">Gates Applied</span></div>
+        <div class="stat-card"><span class="stat-value" id="enc-stat-pixels">—</span><span class="stat-label">Pixels Modified</span></div>
+        <div class="stat-card"><span class="stat-value" id="enc-stat-entropy">—</span><span class="stat-label">Key Entropy</span></div>
+      </div>
+    </section>
+ 
+    <!-- DECODE PANEL -->
+    <section class="main-panel" id="panel-decode" role="tabpanel" aria-labelledby="tab-decode" hidden>
+      <div class="drop-zone" id="dec-dropzone" aria-label="Upload stego image">
+        <input class="drop-zone__file-input" type="file" id="dec-file-input" accept="image/png,image/jpeg,image/webp,image/bmp" aria-label="Choose a stego image file"/>
+        <span class="drop-zone__icon" aria-hidden="true">🔍</span>
+        <span class="drop-zone__title">Upload Stego Image</span>
+        <span class="drop-zone__sub">Upload the PNG encoded with QuantumStego</span>
+      </div>
+ 
+      <div class="preview-grid" id="dec-preview-grid">
+        <div class="preview-box">
+          <img class="preview-box__img" id="dec-preview-img" src="" alt="Stego image preview"/>
+          <span class="preview-box__label">STEGO IMAGE</span>
+          <span class="preview-box__info" id="dec-img-info" aria-live="polite">—</span>
+        </div>
+        <div class="preview-box">
+          <div class="pixel-bitmap" id="dec-pixel-bitmap" aria-label="LSB pixel map" role="img"></div>
+          <span class="preview-box__label">QUANTUM LSB PIXEL MAP (first 64 pixels)</span>
+          <span class="preview-box__info" id="dec-lsb-info" aria-live="polite">—</span>
+        </div>
+      </div>
+ 
+      <div class="key-panel" id="dec-key-panel" aria-label="Reconstructed quantum key">
+        <div class="key-panel__label">🔑 Reconstructed Quantum Key</div>
+        <div class="key-bits" id="dec-key-bits" role="list" aria-label="Reconstructed quantum key bits"></div>
+        <div class="key-stats" id="dec-key-stats" aria-live="polite"></div>
+      </div>
+ 
+      <div class="passphrase-group" role="group" aria-labelledby="dec-pass-label">
+        <div class="passphrase-label" id="dec-pass-label">
+          <span aria-hidden="true">🔐</span> Enter Passphrase to Unlock
+        </div>
+        <div class="passphrase-row">
+          <input class="passphrase-input" type="password" id="dec-passphrase" autocomplete="current-password" spellcheck="false" placeholder="Enter the passphrase used during encoding…" aria-describedby="dec-pass-hint"/>
+          <button class="passphrase-toggle" type="button" id="dec-pass-toggle" aria-label="Toggle passphrase visibility">👁</button>
+        </div>
+        <span class="passphrase-hint" id="dec-pass-hint">⚠ Wrong passphrase = authentication fails — only encoder's passphrase works</span>
+      </div>
+ 
+      <div class="auth-alert" id="dec-auth-alert" role="alert" aria-live="assertive">
+        🚫 <strong>Authentication Failed</strong> — Incorrect passphrase or this image contains no QuantumStego payload. Please verify your passphrase and try again.
+      </div>
+ 
+      <div class="process-log" id="dec-log" role="log" aria-label="Decoding process log" aria-live="polite"></div>
+ 
+      <div class="progress-wrap" id="dec-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="progress-header">
+          <span class="progress-header__label" id="dec-progress-label">Initialising decoder…</span>
+          <span class="progress-header__pct" id="dec-progress-pct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="dec-progress-fill"></div>
+        </div>
+      </div>
+ 
+      <button class="btn btn--green" id="dec-submit-btn" type="button" onclick="App.runDecode()">🔓 Quantum Decode — Reveal Hidden Text</button>
+ 
+      <div class="result-section" id="dec-result" aria-live="polite">
+        <div class="result-header">
+          <span class="result-badge" id="dec-result-badge">—</span>
+        </div>
+        <div class="result-box" id="dec-result-box">
+          <div class="result-text" id="dec-result-text"></div>
+        </div>
+      </div>
+ 
+      <div class="stats-grid" id="dec-stats" aria-label="Decoding statistics">
+        <div class="stat-card"><span class="stat-value" id="dec-stat-qubits">—</span><span class="stat-label">Qubits Measured</span></div>
+        <div class="stat-card"><span class="stat-value" id="dec-stat-gates">—</span><span class="stat-label">Gates Applied</span></div>
+        <div class="stat-card"><span class="stat-value" id="dec-stat-bits">—</span><span class="stat-label">Bits Extracted</span></div>
+        <div class="stat-card"><span class="stat-value" id="dec-stat-fidelity">—</span><span class="stat-label">Fidelity %</span></div>
+      </div>
+    </section>
+ 
+    <section aria-label="How the quantum engine works">
+      <div class="section-heading"><h2>How The Quantum + Auth Engine Works</h2></div>
+      <div class="how-grid">
+        <article class="how-card">
+          <div class="how-card__step">STEP 01 — ENCODE</div>
+          <h3 class="how-card__title">Quantum Key Generation</h3>
+          <div class="how-card__body"><strong>8 qubits</strong> run through H → CNOT → Rz → Measure. Passphrase is hashed (djb2 ⊕ fnv1a) and XOR'd with the quantum key to create a <strong>combined seed</strong> unique to image + passphrase.<div class="how-card__formula">finalSeed = imgSeed ⊕ quantumKey ⊕ passHash</div></div>
+        </article>
+        <article class="how-card">
+          <div class="how-card__step">STEP 02 — ENCODE</div>
+          <h3 class="how-card__title">Quantum LSB Embedding</h3>
+          <div class="how-card__body">Fisher-Yates shuffle seeded by finalSeed permutes all pixel indices. Message bits replace pixel LSBs in <strong>quantum-randomised order</strong>. A unique EOF marker terminates the payload.<div class="how-card__formula">pixel[shuffled[i]].R = (R &amp; 0xFE) | bit</div></div>
+        </article>
+        <article class="how-card">
+          <div class="how-card__step">STEP 03 — DECODE</div>
+          <h3 class="how-card__title">Passphrase Verification</h3>
+          <div class="how-card__body">The <strong>identical circuit</strong> re-runs on the stego image seed. If passphrase is wrong → different finalSeed → wrong pixel order → <strong>EOF marker never found → authentication fails</strong>.<div class="how-card__formula">wrong pass → wrong seed → no EOF → FAIL ✗</div></div>
+        </article>
+        <article class="how-card">
+          <div class="how-card__step">STEP 04 — DECODE</div>
+          <h3 class="how-card__title">Authenticated Extraction</h3>
+          <div class="how-card__body">Correct passphrase reconstructs exact pixel order. LSBs extracted, bits grouped into bytes, converted to ASCII. <strong>EOF found</strong> → authentication verified → message revealed.<div class="how-card__formula">correct pass → correct seed → EOF ✓</div></div>
+        </article>
+      </div>
+    </section>
+ 
+  </div>
+ 
+  <canvas id="js-work-canvas" aria-hidden="true" hidden></canvas>
+  <script src="js/app.js"> </script>
+</body>
+</html>
